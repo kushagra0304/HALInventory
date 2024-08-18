@@ -1,0 +1,63 @@
+# GET request
+POST http://localhost:3000/api/category
+Content-Type: application/json
+
+{
+    "name": "Laptop"
+}
+
+###
+
+# POST request
+POST http://localhost:3000/api/item
+Content-Type: application/json
+
+{
+    "name": "hp pavillion",
+    "attributes": [
+        {
+            "name": "make",
+            "required": 1
+        },
+        {
+            "name": "model",
+            "required": 1
+        }
+    ],
+    "category_id": 1
+}
+
+###
+
+# GET request
+GET http://localhost:3000/api/category/search?q=laptop
+Accept: application/json
+
+###
+
+# GET request
+GET http://localhost:3000/api/item/1
+Accept: application/json
+
+###
+
+# POST request
+POST http://localhost:3000/api/item/variation
+Content-Type: application/json
+
+{
+    "item_id": 1,
+    "attributeValues": [
+        {
+            "id": 1,
+            "value": "hp"
+        }
+    ],
+    "quantity": 50
+}
+
+###
+
+# GET request
+GET http://localhost:3000/api/item/stock/1
+Accept: application/json
