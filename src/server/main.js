@@ -43,6 +43,6 @@ app.use(middlewares.errorHandler);
 
 // ---------------------------------------------------------
 // Export express app
-ViteExpress.listen(app, 3000, () =>
-  console.log("Server is listening on port 3000..."),
+ViteExpress.listen(app, 10000, () =>
+  console.log("Server is listening on port 10000..."),
 );
