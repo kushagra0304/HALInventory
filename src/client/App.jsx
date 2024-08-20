@@ -3,7 +3,7 @@ import "./App.css";
 import Category from './pages/Category';
 import MyNav from './components/MyNav';
 import Item from './pages/Item';
-import Loan from './pages/loan';
+// import Loan from './pages/loan';
 
 function App() {
   return (
@@ -13,7 +13,7 @@ function App() {
           <Route path="/" element={<MyNav/>}>
             <Route path="/category" element={<Category/>} />
             <Route path="/item" element={<Item/>} />
-            <Route path="/loan" element={<Loan/>}/>
+            {/* <Route path="/loan" element={<Loan/>}/> */}
           </Route>
           <Route path="/*" />
         </Routes>
