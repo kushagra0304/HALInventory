@@ -82,6 +82,38 @@ try {
                 FOREIGN KEY (item_variation_id) REFERENCES item_variation (id)
             )
         `).run()
+
+        db.prepare(`
+            CREATE TABLE IF NOT EXISTS dept (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                dept_code TEXT NOT NULL
+            )
+        `).run()
+
+        db.prepare(`
+            CREATE TABLE IF NOT EXISTS employee (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                dept_id INTEGER NOT NULL,
+                landline TEXT,
+                mobile_number TEXT,
+                grade TEXT,
+                FOREIGN KEY (dept_id) REFERENCES dept (id)
+            )
+        `).run()
+
+        db.prepare(`
+            CREATE TABLE IF NOT EXISTS loan (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                stock_id INTEGER NOT NULL,
+                emp_id INTEGER NOT NULL,
+                from_date TEXT NOT NULL,
+                to_date TEXT,
+                FOREIGN KEY (stock_id) REFERENCES item_stock (id),
+                FOREIGN KEY (emp_id) REFERENCES employee (id)
+            )
+        `).run()
     })
 
     transaction();

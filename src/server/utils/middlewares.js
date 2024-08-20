@@ -1,5 +1,5 @@
 const errorHandler = async (error, request, response, next) => {
-    response.status(500);
+    response.status(500).end();
 
     console.error(error);
 };

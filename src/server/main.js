@@ -12,6 +12,7 @@ import 'express-async-errors';
 import './database/database.js';
 import categoryRouter from './controllers/category.js';
 import itemRouter from './controllers/item.js';
+import loanRouter from './controllers/loan.js';
 import middlewares from './utils/middlewares.js';
 
 // ---------------------------------------------------------
@@ -34,6 +35,7 @@ app.use(express.json());
 
 app.use('/api/category', categoryRouter);
 app.use('/api/item', itemRouter);
+app.use('/api/loan', loanRouter);
 
 // ----------------------------
 

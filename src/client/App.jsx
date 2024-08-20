@@ -1,22 +1,24 @@
-import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import "./App.css";
+import Category from './pages/Category';
+import MyNav from './components/MyNav';
+import Item from './pages/Item';
+import Loan from './pages/loan';
 
 function App() {
-
   return (
     <Router>
-      <div className="App">
-      <Switch>
-          <Route path="/" exact component={Home} />
-          <Route path="/category" component={About} />
-          <Route path="/item" component={Contact} />
-          <Route path="/item-variation" component={Contact} />
-          <Route path="/loan" component={Contact} />
-          <Route path="*" component={NotFound} />
-        </Switch>
+      <div className="App container">
+        <Routes>
+          <Route path="/" element={<MyNav/>}>
+            <Route path="/category" element={<Category/>} />
+            <Route path="/item" element={<Item/>} />
+            <Route path="/loan" element={<Loan/>}/>
+          </Route>
+          <Route path="/*" />
+        </Routes>
       </div>
     </Router>
-
   );
 }
 

@@ -30,6 +30,12 @@ Content-Type: application/json
 ###
 
 # GET request
+GET http://localhost:3000/api/item/search?q=hp
+Content-Accept: application/json
+
+###
+
+# GET request
 GET http://localhost:3000/api/category/search?q=laptop
 Accept: application/json
 
@@ -49,8 +55,7 @@ Content-Type: application/json
     "item_id": 1,
     "attributeValues": [
         {
-            "id": 1,
-            "value": "hp"
+            "id": 1
         }
     ],
     "quantity": 50
@@ -60,4 +65,19 @@ Content-Type: application/json
 
 # GET request
 GET http://localhost:3000/api/item/stock/1
+Accept: application/json
+
+###
+
+POST http://localhost:3000/api/loan/grant?stock_id=1&emp_id=1
+
+###
+POST http://localhost:3000/api/loan/revoke?stock_id=1
+
+###
+GET http://localhost:3000/api/loan/history/stock/1
+Accept: application/json
+
+###
+GET http://localhost:3000/api/loan/history/employee/1
 Accept: application/json

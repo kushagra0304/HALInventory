@@ -6,14 +6,17 @@ const router = express.Router();
 const insertIntoItem = db.prepare('INSERT INTO item (name, category_id) VALUES (?, ?)');
 const insertIntoItemAttribute = db.prepare(`INSERT INTO item_attribute (name, item_id, required) VALUES (?, ?, ?)`)
 
+// Create item
 router.post('', async (request, response) => {
-    const { name, attributes, category_id } = request.body;
+    const { name, attributes, category_name } = request.body;
 
     const transaction = db.transaction(() => {
-        const { lastInsertRowid } = insertIntoItem.run(name, category_id);
+        const { id } = db.prepare('SELECT id FROM category WHERE name = ?').get(category_name);
+
+        const { lastInsertRowid } = insertIntoItem.run(name, id);
 
         attributes.forEach((attribute) => {
-            insertIntoItemAttribute.run(attribute.name, lastInsertRowid, attribute.required);
+            insertIntoItemAttribute.run(attribute.name, lastInsertRowid, attribute.required ? 1 : 0);
         });
     })
 
@@ -22,8 +25,9 @@ router.post('', async (request, response) => {
     response.end();
 })
 
-const searchInItem = db.prepare('SELECT name FROM item WHERE name LIKE ?');
+const searchInItem = db.prepare('SELECT * FROM item WHERE name LIKE ? OR id = ?');
 
+// Search items
 router.get('/search', async (request, response) => {
     let { q } = request.query;
 
@@ -31,7 +35,7 @@ router.get('/search', async (request, response) => {
         q = "";
     }
 
-    const rows = searchInItem.all(q);
+    const rows = searchInItem.all(`%${q}%`, q);
 
     response.json(rows);
 })
@@ -40,6 +44,7 @@ const getItem = db.prepare('SELECT * FROM item WHERE id = ?');
 const getItemAttributes = db.prepare('SELECT * FROM item_attribute WHERE item_id = ?');
 const getCategoryName = db.prepare('SELECT name FROM category WHERE id = ?');
 
+// Fetch true item
 router.get('/:id', async (request, response) => {
     const { id } = request.params;
 
@@ -49,6 +54,7 @@ router.get('/:id', async (request, response) => {
     item.name = data.name;
     item.category_id = data.category_id;
     item.category = getCategoryName.get(data.category_id).name;
+    item.id = id;
 
     data = getItemAttributes.all(id);
     item.attributes = data.reduce((attributes, row) => {
@@ -68,11 +74,14 @@ const insertIntoItemVariationValue = db.prepare('INSERT INTO item_variation_valu
 const insertIntoItemStock = db.prepare('INSERT INTO item_stock (item_variation_id, loaned) VALUES (?, ?)');
 
 // fix this
+// Create variation
 router.post('/variation', async (request, response) => {
     const { item_id, attributeValues, quantity } = request.body;
 
+    const stockIds = [];
+
     const transaction = db.transaction(() => {
-        const { lastInsertRowid } = insertIntoItemVariation.run(item_id, quantity);
+        let { lastInsertRowid: variationId } = insertIntoItemVariation.run(item_id, quantity);
 
         const itemAttributes = getItemAttributes.all(item_id);
 
@@ -81,22 +90,22 @@ router.post('/variation', async (request, response) => {
 
             if(!attributeValue){
                 if(itemAttribute.required === 1){
-                    console.log(itemAttribute)
                     throw new Error(`Missing required attribute when inserting item variation.`);
                 } 
             }
 
-            insertIntoItemVariationValue.run(lastInsertRowid, itemAttribute.id, attributeValue ? attributeValue.value : "");
+            insertIntoItemVariationValue.run(variationId, itemAttribute.id, attributeValue ? attributeValue.value : "");
         });
 
         for(let i = 0; i < quantity; i++) {
-            insertIntoItemStock.run(lastInsertRowid, 0);
+            const { lastInsertRowid } = insertIntoItemStock.run(variationId, 0);
+            stockIds.push(lastInsertRowid);
         }
     })
 
     transaction();
 
-    response.end();
+    response.json(stockIds);
 })
 
 const getStock = db.prepare('SELECT * FROM item_stock WHERE id = ?');
@@ -104,6 +113,7 @@ const getItemVariationValues = db.prepare('SELECT * FROM item_variation_value WH
 const getItemAttribute = db.prepare('SELECT * FROM item_attribute WHERE id = ?');
 const getItemVariation = db.prepare('SELECT * FROM item_variation WHERE id = ?');
 
+// Fetch stock item
 router.get('/stock/:id', async (request, response) => {
     const { id } = request.params;
 

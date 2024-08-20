@@ -18,7 +18,7 @@ router.post('', async (request, response) => {
     response.end();
 })
 
-const searchInCategory = db.prepare(`SELECT name FROM category WHERE name LIKE ?`);
+const searchInCategory = db.prepare(`SELECT name FROM category WHERE name LIKE ? OR id = ?`);
 
 router.get('/search', async (request, response) => {
     let { q } = request.query;
@@ -27,7 +27,7 @@ router.get('/search', async (request, response) => {
         q = "";
     }
 
-    const rows = searchInCategory.all(q);
+    const rows = searchInCategory.all(`%${q}%`, q);
 
     response.json(rows);
 })
